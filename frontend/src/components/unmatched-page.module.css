@@ -1,0 +1,291 @@
+.stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: 1.2rem;
+  line-height: 1.15;
+  margin-bottom: 0.2rem;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.pill {
+  border: 1px solid rgba(241, 187, 78, 0.25);
+  background: rgba(241, 187, 78, 0.06);
+  color: var(--warn);
+  border-radius: 999px;
+  padding: 0.4rem 0.7rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+}
+
+.filters {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.75rem;
+  display: grid;
+  gap: 0.6rem;
+  background: rgba(255, 255, 255, 0.012);
+}
+
+.filtersRow {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.filterField {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.filterLabel {
+  color: var(--text-dim);
+  font-size: 0.78rem;
+}
+
+.filterControl {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 0.55rem 0.65rem;
+}
+
+.filtersHint {
+  color: var(--text-dim);
+  font-size: 0.82rem;
+}
+
+.section {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.012);
+  padding: 0.85rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.sectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.sectionTitle {
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
+.sectionMeta {
+  color: var(--text-dim);
+  font-size: 0.82rem;
+}
+
+.cards {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.01);
+  padding: 0.9rem;
+  display: grid;
+  gap: 0.6rem;
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.cardBusy {
+  opacity: 0.65;
+}
+
+.cardTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.cardSub {
+  color: var(--text-muted);
+}
+
+.metaLine {
+  color: var(--text-dim);
+  font-size: 0.86rem;
+}
+
+.reason {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.bestGuess {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.65rem;
+  background: rgba(255, 255, 255, 0.01);
+  display: grid;
+  gap: 0.45rem;
+}
+
+.bestGuessLabel {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+}
+
+.bestGuessMain {
+  color: var(--text);
+}
+
+.bestGuessMeta {
+  color: var(--text-dim);
+  font-size: 0.82rem;
+}
+
+.bestGuessActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.useBtn {
+  border: 1px solid rgba(117, 135, 255, 0.26);
+  background: rgba(117, 135, 255, 0.12);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.88rem;
+}
+
+.useBtn:hover:not(:disabled) {
+  background: rgba(117, 135, 255, 0.18);
+}
+
+.ghostBtn {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.015);
+  color: var(--text-muted);
+  border-radius: 10px;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.88rem;
+}
+
+.ghostBtn:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.dismissBtn {
+  border: 1px solid var(--line);
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.015);
+  border-radius: 10px;
+  padding: 0.5rem 0.72rem;
+}
+
+.dismissBtn:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.confirmBtn {
+  border: 1px solid rgba(117, 135, 255, 0.26);
+  background: rgba(117, 135, 255, 0.13);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 0.5rem 0.72rem;
+  font-weight: 600;
+}
+
+.confirmBtn:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.inlineStatus {
+  color: var(--text-dim);
+  font-size: 0.82rem;
+}
+
+.empty {
+  border: 1px dashed var(--line-strong);
+  border-radius: 12px;
+  padding: 0.85rem;
+  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.006);
+}
+
+.collapseBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--text-muted);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.45rem 0.65rem;
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.collapseBtn:hover {
+  color: var(--text);
+}
+
+.playlistCard {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.75rem;
+  display: grid;
+  gap: 0.45rem;
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.playlistActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.error {
+  color: var(--danger);
+}
+
+@media (max-width: 960px) {
+  .filtersRow {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .filtersRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+}

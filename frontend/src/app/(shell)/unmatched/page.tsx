@@ -1,22 +1,37 @@
-import styles from "../page-header.module.css";
+import { UnmatchedPage } from "@/components/unmatched-page";
+import { getUnmatchedListView } from "@/lib/mock/store";
 
-export default function UnmatchedPage() {
-  return (
-    <section>
-      <header className={styles.header}>
-        <div>
-          <h1 className={styles.title}>Unmatched</h1>
-          <p className={styles.subtitle}>
-            Inline triage for songs and playlists that need review.
-          </p>
-        </div>
-        <span className={styles.pill}>4 pending</span>
-      </header>
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
-      <div className={styles.placeholder}>
-        This page will become the fast inline review workflow: best-guess shortcut,
-        dismiss, filters, and optimistic updates.
-      </div>
-    </section>
-  );
+function firstParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export default async function UnmatchedRoute({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const params = await searchParams;
+  const sourceService = firstParam(params.sourceService);
+  const playlist = firstParam(params.playlist);
+  const runId = firstParam(params.runId);
+  const sort = firstParam(params.sort);
+  const status = firstParam(params.status);
+
+  const data = getUnmatchedListView({
+    sourceService:
+      sourceService === "spotify" || sourceService === "apple_music" || sourceService === "all"
+        ? sourceService
+        : undefined,
+    playlist: playlist ?? undefined,
+    runId: runId ?? undefined,
+    sort:
+      sort === "newest" || sort === "oldest" || sort === "playlist" || sort === "reason"
+        ? sort
+        : undefined,
+    status: status === "all" || status === "pending" || status === "dismissed" ? status : undefined,
+  });
+
+  return <UnmatchedPage initialData={data} />;
 }
