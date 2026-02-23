@@ -70,4 +70,25 @@ describe("SetupWizard", () => {
       expect(screen.getByText("Connect Apple Music")).toBeInTheDocument();
     });
   });
+
+  it("skips Apple as a blocker in spotify read-only mode and shows deferred messaging", () => {
+    const readOnlyStatus: SetupStatusView = {
+      spotifyConnected: true,
+      appleConnected: false,
+      initialScanStatus: "not_started",
+      initialScanRunId: null,
+      stageLabel: null,
+      setupComplete: false,
+      mode: "spotify_readonly",
+      readOnlyMode: true,
+      appleDeferred: true,
+      spotifyProfileName: "test-user",
+    };
+
+    render(<SetupWizard initialStatus={readOnlyStatus} />);
+
+    expect(screen.getByRole("heading", { name: "Initial Spotify Scan" })).toBeInTheDocument();
+    expect(screen.getByText(/Deferred in read-only mode/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Start Initial Spotify Scan ->" })).toBeInTheDocument();
+  });
 });
