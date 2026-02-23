@@ -1,11 +1,11 @@
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { NextResponse } from "next/server";
 
 import { buildSpotifyAuthorizeUrl, createSpotifyOAuthState } from "@/lib/server/spotify/oauth";
 
 const SPOTIFY_OAUTH_STATE_COOKIE = "musicsynk_spotify_oauth_state";
 
-export default async function SpotifyAuthStartPage() {
+export async function GET() {
   const state = createSpotifyOAuthState();
   const jar = await cookies();
   jar.set(SPOTIFY_OAUTH_STATE_COOKIE, state, {
@@ -16,5 +16,5 @@ export default async function SpotifyAuthStartPage() {
     maxAge: 60 * 10,
   });
 
-  redirect(buildSpotifyAuthorizeUrl(state));
+  return NextResponse.redirect(buildSpotifyAuthorizeUrl(state));
 }
