@@ -70,7 +70,7 @@ export function DashboardPage({ initialData }: Props) {
 
   const lastRun = data.lastRun;
 
-  const refreshDashboard = useEffectEvent(async () => {
+  async function loadDashboardSnapshot() {
     try {
       const next = await jsonFetch<DashboardView>("/api/dashboard?limit=30");
       setData(next);
@@ -84,20 +84,28 @@ export function DashboardPage({ initialData }: Props) {
     } catch {
       setSyncError("Could not refresh dashboard.");
     }
+  }
+
+  const refreshDashboardForPolling = useEffectEvent(async () => {
+    await loadDashboardSnapshot();
   });
+
+  async function refreshDashboard() {
+    await loadDashboardSnapshot();
+  }
 
   useEffect(() => {
     if (data.lastRun?.status !== "running") return;
 
-    void refreshDashboard();
+    void refreshDashboardForPolling();
     const id = window.setInterval(() => {
-      void refreshDashboard();
+      void refreshDashboardForPolling();
     }, 1000);
 
     return () => {
       window.clearInterval(id);
     };
-  }, [data.lastRun?.status, refreshDashboard]);
+  }, [data.lastRun?.status]);
 
   async function startSync() {
     setSyncBusy(true);
