@@ -872,7 +872,10 @@ export function updateSettings(payload: SettingsUpdatePayload) {
     };
   }
 
-  if (typeof payload.matchThreshold === "number") {
+  if (
+    typeof payload.matchThreshold === "number" &&
+    Number.isFinite(payload.matchThreshold)
+  ) {
     state.settings.matchThreshold = Math.max(0.7, Math.min(0.95, payload.matchThreshold));
   }
 
