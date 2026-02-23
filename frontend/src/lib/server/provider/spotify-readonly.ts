@@ -13,6 +13,7 @@ import { getServerConfig } from "@/lib/server/config";
 import {
   getAuthSessionRow,
   getDecryptedAuthSession,
+  markAuthSessionInvalid,
   type StoredAuthEnvelope,
 } from "@/lib/server/data/auth-sessions";
 import {
@@ -506,6 +507,11 @@ export const spotifyReadonlyProvider: AppProvider = {
 
   async connectSpotify() {
     // In real mode the UI uses /auth/spotify. Keep this endpoint shape-compatible.
+    return this.getSetupStatusView();
+  },
+
+  async disconnectSpotify() {
+    await markAuthSessionInvalid("spotify", "user_logout");
     return this.getSetupStatusView();
   },
 

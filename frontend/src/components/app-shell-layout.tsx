@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import type { AppShellStatus, AuthHealth } from "@/lib/types";
 import styles from "./app-shell-layout.module.css";
@@ -32,6 +32,26 @@ function statusText(status: AuthHealth) {
 
 export function AppShellLayout({ children, shellStatus }: AppShellLayoutProps) {
   const pathname = usePathname();
+  const [disconnectBusy, setDisconnectBusy] = useState(false);
+  const [disconnectError, setDisconnectError] = useState<string | null>(null);
+
+  async function disconnectSpotifySession() {
+    setDisconnectBusy(true);
+    setDisconnectError(null);
+    try {
+      const response = await fetch("/api/auth/spotify/logout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+      });
+      if (!response.ok) {
+        throw new Error(`Request failed: ${response.status}`);
+      }
+      window.location.assign("/setup");
+    } catch {
+      setDisconnectBusy(false);
+      setDisconnectError("Could not disconnect Spotify.");
+    }
+  }
 
   return (
     <div className={styles.shell}>
@@ -86,6 +106,19 @@ export function AppShellLayout({ children, shellStatus }: AppShellLayoutProps) {
             </span>
             <span>{statusText(shellStatus.spotifyAuth)}</span>
           </div>
+          {shellStatus.readOnlyMode && shellStatus.spotifyAuth !== "missing" ? (
+            <div className={styles.serviceActionRow}>
+              <button
+                type="button"
+                className={styles.serviceActionBtn}
+                onClick={() => void disconnectSpotifySession()}
+                disabled={disconnectBusy}
+              >
+                {disconnectBusy ? "Disconnecting..." : "Disconnect Spotify"}
+              </button>
+              {disconnectError ? <span className={styles.serviceError}>{disconnectError}</span> : null}
+            </div>
+          ) : null}
           <div className={styles.serviceRow}>
             <span className={styles.serviceLabel}>
               <span

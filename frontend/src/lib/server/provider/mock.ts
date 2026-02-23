@@ -78,6 +78,9 @@ export const mockProvider: AppProvider = {
   async connectSpotify() {
     return patchSetup(mockStore.mockConnectSpotify());
   },
+  async disconnectSpotify() {
+    return patchSetup(mockStore.mockDisconnectSpotify());
+  },
   async connectApple() {
     return patchSetup(mockStore.mockConnectApple());
   },

@@ -40,6 +40,10 @@ export async function connectSpotify() {
   return resolveProvider().connectSpotify();
 }
 
+export async function disconnectSpotify() {
+  return resolveProvider().disconnectSpotify();
+}
+
 export async function connectApple() {
   return resolveProvider().connectApple();
 }

@@ -23,6 +23,7 @@ export type AppProvider = {
   getRunDetailView(id: string): Promise<RunDetailView | null>;
   getSetupStatusView(): Promise<SetupStatusView>;
   connectSpotify(): Promise<SetupStatusView>;
+  disconnectSpotify(): Promise<SetupStatusView>;
   connectApple(): Promise<SetupStatusView>;
   startInitialScan(): Promise<SetupStatusView>;
   triggerManualSync(): Promise<{ queued: boolean; run: RunHistoryRowView }>;

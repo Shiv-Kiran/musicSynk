@@ -130,6 +130,38 @@
   font-size: 0.9rem;
 }
 
+.serviceActionRow {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0 0.3rem 0.35rem;
+}
+
+.serviceActionBtn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--text-dim);
+  padding: 0;
+  text-align: left;
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.serviceActionBtn:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.serviceActionBtn:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+
+.serviceError {
+  color: var(--danger);
+  font-size: 0.75rem;
+}
+
 .serviceLabel {
   display: inline-flex;
   align-items: center;

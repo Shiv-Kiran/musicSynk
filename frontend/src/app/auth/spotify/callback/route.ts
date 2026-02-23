@@ -10,10 +10,10 @@ import {
 
 const SPOTIFY_OAUTH_STATE_COOKIE = "musicsynk_spotify_oauth_state";
 
-function redirectWithError(message: string) {
-  const url = new URL("/setup", "http://localhost");
-  url.searchParams.set("error", message);
-  return NextResponse.redirect(url.pathname + url.search);
+function redirectWithError(requestUrl: URL, message: string) {
+  const redirectUrl = new URL("/setup", requestUrl);
+  redirectUrl.searchParams.set("error", message);
+  return NextResponse.redirect(redirectUrl);
 }
 
 export async function GET(request: Request) {
@@ -25,12 +25,13 @@ export async function GET(request: Request) {
 
   if (error) {
     return redirectWithError(
+      url,
       `spotify_oauth_${error}${errorDescription ? `:${errorDescription}` : ""}`,
     );
   }
 
   if (!code || !state) {
-    return redirectWithError("spotify_oauth_missing_code_or_state");
+    return redirectWithError(url, "spotify_oauth_missing_code_or_state");
   }
 
   const jar = await cookies();
@@ -38,7 +39,7 @@ export async function GET(request: Request) {
   jar.delete(SPOTIFY_OAUTH_STATE_COOKIE);
 
   if (!expectedState || expectedState !== state) {
-    return redirectWithError("spotify_oauth_state_mismatch");
+    return redirectWithError(url, "spotify_oauth_state_mismatch");
   }
 
   try {
@@ -59,6 +60,6 @@ export async function GET(request: Request) {
   } catch (exchangeError) {
     const message =
       exchangeError instanceof Error ? exchangeError.message : "spotify_oauth_failed";
-    return redirectWithError(message.slice(0, 180));
+    return redirectWithError(url, message.slice(0, 180));
   }
 }
