@@ -53,7 +53,7 @@ const dashboardFixture: DashboardView = {
       id: "run_1",
       startedAt: "2026-02-23T00:01:00.000Z",
       status: "completed",
-      summaryLine: "3 -> Spotify · 1 -> Apple · 2 unmatched",
+      summaryLine: "3 -> Spotify | 1 -> Apple | 2 unmatched",
       durationSeconds: 102,
       counts: { addedToSpotify: 3, addedToApple: 1, unmatched: 2 },
     },
@@ -64,6 +64,7 @@ describe("DashboardPage", () => {
   beforeEach(() => {
     routerMock.refresh.mockReset();
     routerMock.replace.mockReset();
+    vi.unstubAllGlobals();
     vi.stubGlobal("fetch", vi.fn());
   });
 
@@ -71,8 +72,8 @@ describe("DashboardPage", () => {
     render(<DashboardPage initialData={dashboardFixture} />);
 
     expect(screen.getByText(/Last sync/i)).toBeInTheDocument();
-    expect(screen.getByText("✓ completed")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Review →" })).toHaveAttribute(
+    expect(screen.getByText("OK completed")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Review ->" })).toHaveAttribute(
       "href",
       "/unmatched?runId=run_1&status=pending",
     );
@@ -82,10 +83,28 @@ describe("DashboardPage", () => {
     const user = userEvent.setup();
     render(<DashboardPage initialData={dashboardFixture} />);
 
-    await user.click(screen.getByRole("button", { name: "Sync Now →" }));
+    await user.click(screen.getByRole("button", { name: "Sync Now ->" }));
 
     expect(screen.getByText("Start manual sync?")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Start" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Cancel" })).toBeInTheDocument();
+  });
+
+  it("switches the primary action label in read-only mode", async () => {
+    const user = userEvent.setup();
+    render(
+      <DashboardPage
+        initialData={{
+          ...dashboardFixture,
+          readOnlyMode: true,
+          primaryActionLabel: "Refresh Snapshot",
+          modeBannerNote: "Read-only validation mode: no playlist writes enabled.",
+        }}
+      />,
+    );
+
+    expect(screen.getByText(/Read-only validation mode/i)).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Refresh Snapshot ->" }));
+    expect(screen.getByText("Start snapshot refresh?")).toBeInTheDocument();
   });
 });

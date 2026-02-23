@@ -18,6 +18,7 @@ describe("SetupWizard", () => {
   beforeEach(() => {
     routerMock.replace.mockReset();
     routerMock.refresh.mockReset();
+    vi.unstubAllGlobals();
   });
 
   it("renders background-first initial scan messaging on step 3", () => {
@@ -34,7 +35,7 @@ describe("SetupWizard", () => {
 
     expect(screen.getByText("Initial Library Scan")).toBeInTheDocument();
     expect(screen.getByText(/You can close this tab/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Start Initial Scan →" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Start Initial Scan ->" })).toBeInTheDocument();
   });
 
   it("advances from Spotify connect to Apple connect using mock API", async () => {
@@ -63,7 +64,7 @@ describe("SetupWizard", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     render(<SetupWizard initialStatus={initial} />);
-    await user.click(screen.getByRole("button", { name: "Connect with Spotify →" }));
+    await user.click(screen.getByRole("button", { name: "Connect with Spotify ->" }));
 
     await waitFor(() => {
       expect(screen.getByText("Connect Apple Music")).toBeInTheDocument();

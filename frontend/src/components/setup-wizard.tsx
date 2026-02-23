@@ -31,7 +31,7 @@ async function api<T>(url: string, init?: RequestInit): Promise<T> {
 
 function getCurrentStep(status: SetupStatusView) {
   if (!status.spotifyConnected) return 1;
-  if (!status.appleConnected) return 2;
+  if (!status.appleConnected && !status.appleDeferred) return 2;
   if (!status.setupComplete) return 3;
   return 3;
 }
@@ -46,6 +46,11 @@ export function SetupWizard({ initialStatus }: Props) {
   const mountedRef = useRef(true);
 
   const currentStep = getCurrentStep(status);
+  const readOnlyMode = Boolean(status.readOnlyMode);
+  const appleDeferred = Boolean(status.appleDeferred);
+  const spotifyConnectedLabel = status.spotifyProfileName
+    ? `Connected as ${status.spotifyProfileName}`
+    : "Connected";
 
   useEffect(() => {
     mountedRef.current = true;
@@ -74,10 +79,7 @@ export function SetupWizard({ initialStatus }: Props) {
 
   useEffect(() => {
     if (status.setupComplete) return;
-    if (
-      status.initialScanStatus !== "queued" &&
-      status.initialScanStatus !== "running"
-    ) {
+    if (status.initialScanStatus !== "queued" && status.initialScanStatus !== "running") {
       return;
     }
 
@@ -107,7 +109,6 @@ export function SetupWizard({ initialStatus }: Props) {
             router.replace("/dashboard");
             router.refresh();
           });
-          return;
         }
       } catch {
         if (!active || !mountedRef.current) return;
@@ -137,6 +138,12 @@ export function SetupWizard({ initialStatus }: Props) {
   async function connectSpotify() {
     setSpotifyAction("pending");
     setStatusError(null);
+
+    if (status.mode === "spotify_readonly") {
+      window.location.assign("/auth/spotify");
+      return;
+    }
+
     try {
       const next = await api<SetupStatusView>("/api/setup/connect/spotify", {
         method: "POST",
@@ -146,11 +153,16 @@ export function SetupWizard({ initialStatus }: Props) {
       setSpotifyAction("idle");
     } catch {
       setSpotifyAction("error");
-      setStatusError("Spotify mock connect failed.");
+      setStatusError("Spotify connect failed.");
     }
   }
 
   async function connectApple() {
+    if (appleDeferred) {
+      await refreshStatus();
+      return;
+    }
+
     setAppleAction("pending");
     setStatusError(null);
     try {
@@ -162,7 +174,7 @@ export function SetupWizard({ initialStatus }: Props) {
       setAppleAction("idle");
     } catch {
       setAppleAction("error");
-      setStatusError("Apple Music mock connect failed.");
+      setStatusError("Apple Music connect failed.");
     }
   }
 
@@ -182,8 +194,7 @@ export function SetupWizard({ initialStatus }: Props) {
     }
   }
 
-  const scanBusy =
-    status.initialScanStatus === "queued" || status.initialScanStatus === "running";
+  const scanBusy = status.initialScanStatus === "queued" || status.initialScanStatus === "running";
 
   return (
     <main className={styles.wrap}>
@@ -191,7 +202,7 @@ export function SetupWizard({ initialStatus }: Props) {
         <header className={styles.header}>
           <div className={styles.brand}>
             <span className={styles.brandMark} aria-hidden="true">
-              ♪
+              *
             </span>
             <span>music sync</span>
           </div>
@@ -207,18 +218,22 @@ export function SetupWizard({ initialStatus }: Props) {
               title: "Connect Spotify",
               done: status.spotifyConnected,
               active: currentStep === 1,
-              sub: status.spotifyConnected ? "Connected" : "OAuth setup",
+              sub: status.spotifyConnected ? spotifyConnectedLabel : "OAuth setup",
             },
             {
               index: 2,
               title: "Connect Apple",
               done: status.appleConnected,
               active: currentStep === 2,
-              sub: status.appleConnected ? "Connected" : "One-time login",
+              sub: appleDeferred
+                ? "Deferred in read-only mode"
+                : status.appleConnected
+                  ? "Connected"
+                  : "One-time login",
             },
             {
               index: 3,
-              title: "Initial Scan",
+              title: readOnlyMode ? "Initial Spotify Scan" : "Initial Scan",
               done: status.setupComplete,
               active: currentStep === 3,
               sub: status.stageLabel ?? "Background scan",
@@ -234,10 +249,7 @@ export function SetupWizard({ initialStatus }: Props) {
                 .join(" ")
                 .trim()}
             >
-              <div className={styles.progressTitle}>
-                {step.done ? "✓ " : ""}
-                {step.title}
-              </div>
+              <div className={styles.progressTitle}>{step.done ? "Done: " : ""}{step.title}</div>
               <div className={styles.progressSub}>{step.sub}</div>
             </div>
           ))}
@@ -247,17 +259,19 @@ export function SetupWizard({ initialStatus }: Props) {
           <section className={styles.card}>
             <h1 className={styles.cardTitle}>Connect Spotify</h1>
             <p className={styles.cardBody}>
-              This is the mock onboarding path for fast UI testing. In the real
-              flow, this button redirects to Spotify OAuth.
+              {readOnlyMode
+                ? "Read-only validation mode is enabled. This button opens Spotify OAuth and stores a read-only session for snapshot validation."
+                : "This is the mock onboarding path for fast UI testing. In the real flow, this button redirects to Spotify OAuth."}
             </p>
+            {readOnlyMode ? (
+              <p className={styles.cardBody}>No playlist writes are enabled in this phase.</p>
+            ) : null}
             <div className={styles.statusLine}>
               <span
-                className={`${styles.statusDot} ${
-                  status.spotifyConnected ? styles.statusDone : ""
-                }`.trim()}
+                className={`${styles.statusDot} ${status.spotifyConnected ? styles.statusDone : ""}`.trim()}
                 aria-hidden="true"
               />
-              {status.spotifyConnected ? "Connected" : "Not connected"}
+              {status.spotifyConnected ? spotifyConnectedLabel : "Not connected"}
             </div>
             <div className={styles.ctaRow}>
               <button
@@ -269,8 +283,8 @@ export function SetupWizard({ initialStatus }: Props) {
                 {status.spotifyConnected
                   ? "Spotify Connected"
                   : spotifyAction === "pending"
-                    ? "Connecting…"
-                    : "Connect with Spotify →"}
+                    ? "Connecting..."
+                    : "Connect with Spotify ->"}
               </button>
               <button className={styles.ghostBtn} type="button" onClick={() => void refreshStatus()}>
                 Refresh status
@@ -283,30 +297,35 @@ export function SetupWizard({ initialStatus }: Props) {
           <section className={styles.card}>
             <h1 className={styles.cardTitle}>Connect Apple Music</h1>
             <p className={styles.cardBody}>
-              We open a login session once and save it for nightly syncs. This mock
-              version completes instantly so you can test the UX flow.
+              {appleDeferred
+                ? "Apple Music is intentionally deferred in this read-only validation phase. We are validating real Spotify data and Supabase persistence first."
+                : "We open a login session once and save it for nightly syncs. This mock version completes instantly so you can test the UX flow."}
             </p>
             <div className={styles.statusLine}>
               <span
-                className={`${styles.statusDot} ${
-                  status.appleConnected ? styles.statusDone : ""
-                }`.trim()}
+                className={`${styles.statusDot} ${status.appleConnected ? styles.statusDone : ""}`.trim()}
                 aria-hidden="true"
               />
-              {status.appleConnected ? "Connected" : "Waiting for login"}
+              {appleDeferred
+                ? "Deferred in read-only mode"
+                : status.appleConnected
+                  ? "Connected"
+                  : "Waiting for login"}
             </div>
             <div className={styles.ctaRow}>
               <button
                 className={styles.primaryBtn}
                 type="button"
                 onClick={connectApple}
-                disabled={appleAction === "pending" || status.appleConnected}
+                disabled={appleDeferred || appleAction === "pending" || status.appleConnected}
               >
-                {status.appleConnected
-                  ? "Apple Music Connected"
-                  : appleAction === "pending"
-                    ? "Opening login…"
-                    : "Open Apple Music Login →"}
+                {appleDeferred
+                  ? "Deferred in this phase"
+                  : status.appleConnected
+                    ? "Apple Music Connected"
+                    : appleAction === "pending"
+                      ? "Opening login..."
+                      : "Open Apple Music Login ->"}
               </button>
               <button className={styles.ghostBtn} type="button" onClick={() => void refreshStatus()}>
                 Refresh status
@@ -317,17 +336,19 @@ export function SetupWizard({ initialStatus }: Props) {
 
         {currentStep === 3 ? (
           <section className={styles.card}>
-            <h1 className={styles.cardTitle}>Initial Library Scan</h1>
+            <h1 className={styles.cardTitle}>
+              {readOnlyMode ? "Initial Spotify Scan" : "Initial Library Scan"}
+            </h1>
             <p className={styles.cardBody}>
-              We do a first pass across your playlists so future syncs can be
-              incremental. This runs in the background.
+              {readOnlyMode
+                ? "We do a read-only pass across your Spotify playlists and store a snapshot in Supabase for validation. No playlist writes are enabled."
+                : "We do a first pass across your playlists so future syncs can be incremental. This runs in the background."}
             </p>
 
             <div className={styles.scanBox}>
               <div className={styles.scanHint}>
-                You can close this tab after starting the scan. We will keep the UI
-                lightweight and rely on a completion state (and later email) instead
-                of a laggy live progress bar.
+                You can close this tab after starting the scan. We keep this status lightweight and rely
+                on completion state (and later email) instead of a live progress bar.
               </div>
               <div className={styles.statusLine}>
                 <span
@@ -343,7 +364,7 @@ export function SetupWizard({ initialStatus }: Props) {
                   aria-hidden="true"
                 />
                 {status.initialScanStatus.replace("_", " ")}
-                {status.stageLabel ? ` · ${status.stageLabel}` : ""}
+                {status.stageLabel ? ` | ${status.stageLabel}` : ""}
               </div>
             </div>
 
@@ -357,10 +378,12 @@ export function SetupWizard({ initialStatus }: Props) {
                 {status.setupComplete
                   ? "Scan Complete"
                   : scanBusy
-                    ? "Scan Running…"
+                    ? "Scan Running..."
                     : scanAction === "pending"
-                      ? "Starting…"
-                      : "Start Initial Scan →"}
+                      ? "Starting..."
+                      : readOnlyMode
+                        ? "Start Initial Spotify Scan ->"
+                        : "Start Initial Scan ->"}
               </button>
 
               <button className={styles.ghostBtn} type="button" onClick={() => void refreshStatus()}>
@@ -369,9 +392,7 @@ export function SetupWizard({ initialStatus }: Props) {
             </div>
 
             {status.setupComplete ? (
-              <div className={`${styles.note} ${styles.ok}`}>
-                Setup complete. Redirecting to dashboard…
-              </div>
+              <div className={`${styles.note} ${styles.ok}`}>Setup complete. Redirecting to dashboard...</div>
             ) : null}
           </section>
         ) : null}
