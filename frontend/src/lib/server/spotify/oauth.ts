@@ -155,17 +155,35 @@ export async function fetchSpotifyProfile(accessToken: string): Promise<SpotifyP
     cache: "no-store",
   });
 
-  const json = (await response.json()) as {
+  const rawBody = await response.text();
+  let json: {
     id?: string;
     display_name?: string | null;
     product?: string;
     error?: { message?: string };
-  };
+  } | null = null;
 
-  if (!response.ok || !json.id) {
-    throw new Error(
-      `Spotify profile fetch failed: ${json.error?.message ?? response.statusText}`,
-    );
+  try {
+    json = JSON.parse(rawBody) as {
+      id?: string;
+      display_name?: string | null;
+      product?: string;
+      error?: { message?: string };
+    };
+  } catch {
+    json = null;
+  }
+
+  if (!response.ok || !json?.id) {
+    const bodyPreview = rawBody.slice(0, 180).replace(/\s+/g, " ").trim();
+    if (bodyPreview.toLowerCase().includes("check settings")) {
+      throw new Error(
+        "Spotify developer app restriction: add the exact Spotify account email to Users and Access in your Spotify app dashboard, then retry.",
+      );
+    }
+
+    const fallbackMessage = json?.error?.message ?? bodyPreview ?? response.statusText;
+    throw new Error(`Spotify profile fetch failed (${response.status}): ${fallbackMessage}`);
   }
 
   return {
