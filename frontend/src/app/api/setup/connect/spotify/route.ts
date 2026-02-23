@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { mockConnectSpotify } from "@/lib/mock/store";
+import { connectSpotify } from "@/lib/server/provider";
 
 export async function POST() {
-  return NextResponse.json(mockConnectSpotify());
+  return NextResponse.json(await connectSpotify());
 }

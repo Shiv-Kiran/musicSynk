@@ -632,6 +632,13 @@ export function mockConnectSpotify() {
   return getSetupStatusView();
 }
 
+export function mockDisconnectSpotify() {
+  const state = getState();
+  advanceSimulations(state);
+  state.setup.spotifyConnected = false;
+  return getSetupStatusView();
+}
+
 export function mockConnectApple() {
   const state = getState();
   advanceSimulations(state);

@@ -1,5 +1,5 @@
 import { UnmatchedPage } from "@/components/unmatched-page";
-import { getUnmatchedListView } from "@/lib/mock/store";
+import { getUnmatchedListView } from "@/lib/server/provider";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -19,7 +19,7 @@ export default async function UnmatchedRoute({
   const sort = firstParam(params.sort);
   const status = firstParam(params.status);
 
-  const data = getUnmatchedListView({
+  const data = await getUnmatchedListView({
     sourceService:
       sourceService === "spotify" || sourceService === "apple_music" || sourceService === "all"
         ? sourceService

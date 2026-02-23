@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getUnmatchedListView } from "@/lib/mock/store";
+import { getUnmatchedListView } from "@/lib/server/provider";
 import type { SourceService } from "@/lib/types";
 
 function parseSource(value: string | null): "all" | SourceService | undefined {
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
 
   return NextResponse.json(
-    getUnmatchedListView({
+    await getUnmatchedListView({
       status: parseStatus(params.get("status")),
       sourceService: parseSource(params.get("sourceService")),
       playlist: params.get("playlist") ?? undefined,

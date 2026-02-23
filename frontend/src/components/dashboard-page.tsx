@@ -38,10 +38,10 @@ function formatDuration(seconds: number | null) {
 }
 
 function statusSymbol(status: RunHistoryRowView["status"]) {
-  if (status === "completed") return "✓";
-  if (status === "partial") return "⚠";
-  if (status === "failed") return "✗";
-  return "•";
+  if (status === "completed") return "OK";
+  if (status === "partial") return "WARN";
+  if (status === "failed") return "FAIL";
+  return "RUN";
 }
 
 function statusWord(status: RunHistoryRowView["status"]) {
@@ -58,6 +58,11 @@ function bannerClassName(lastRun: DashboardView["lastRun"]) {
   return styles.bannerSuccess;
 }
 
+function bannerTimeLabel(data: DashboardView) {
+  if (data.readOnlyMode) return "Last refresh";
+  return "Last sync";
+}
+
 export function DashboardPage({ initialData }: Props) {
   const router = useRouter();
   const [data, setData] = useState(initialData);
@@ -69,6 +74,8 @@ export function DashboardPage({ initialData }: Props) {
   const [detailLoading, setDetailLoading] = useState<Record<string, boolean>>({});
 
   const lastRun = data.lastRun;
+  const primaryActionLabel = data.primaryActionLabel ?? "Sync Now";
+  const actionNoun = primaryActionLabel === "Refresh Snapshot" ? "snapshot refresh" : "manual sync";
 
   async function loadDashboardSnapshot() {
     try {
@@ -115,7 +122,11 @@ export function DashboardPage({ initialData }: Props) {
       await refreshDashboard();
     } catch {
       setSyncBusy(false);
-      setSyncError("Could not start manual sync.");
+      setSyncError(
+        primaryActionLabel === "Refresh Snapshot"
+          ? "Could not start snapshot refresh."
+          : "Could not start manual sync.",
+      );
     }
   }
 
@@ -146,12 +157,12 @@ export function DashboardPage({ initialData }: Props) {
           <div className={styles.bannerMeta}>
             {lastRun ? (
               <>
-                <span>Last sync</span>
-                <span>·</span>
+                <span>{bannerTimeLabel(data)}</span>
+                <span>|</span>
                 <span>{formatDate(lastRun.startedAt)}</span>
-                <span>·</span>
+                <span>|</span>
                 <span>{formatTime(lastRun.startedAt)}</span>
-                <span>·</span>
+                <span>|</span>
                 <span>{formatDuration(lastRun.durationSeconds)}</span>
               </>
             ) : (
@@ -161,14 +172,14 @@ export function DashboardPage({ initialData }: Props) {
           <div className={styles.syncInline}>
             {confirmSync ? (
               <span className={styles.confirmRow}>
-                <span>Start manual sync?</span>
+                <span>{`Start ${actionNoun}?`}</span>
                 <button
                   className={styles.confirmBtn}
                   type="button"
                   onClick={startSync}
                   disabled={syncBusy || lastRun?.status === "running"}
                 >
-                  {syncBusy ? "Starting…" : "Start"}
+                  {syncBusy ? "Starting..." : "Start"}
                 </button>
                 <button
                   className={styles.cancelBtn}
@@ -186,7 +197,7 @@ export function DashboardPage({ initialData }: Props) {
                 onClick={() => setConfirmSync(true)}
                 disabled={syncBusy || lastRun?.status === "running"}
               >
-                {lastRun?.status === "running" ? "Sync running…" : "Sync Now →"}
+                {lastRun?.status === "running" ? `${primaryActionLabel} running...` : `${primaryActionLabel} ->`}
               </button>
             )}
           </div>
@@ -195,18 +206,20 @@ export function DashboardPage({ initialData }: Props) {
         <div className={styles.bannerStatus}>
           <div>
             <div className={styles.statusText}>
-              {lastRun ? `${statusSymbol(lastRun.status)} ${statusWord(lastRun.status)}` : "No sync history"}
+              {lastRun ? `${statusSymbol(lastRun.status)} ${statusWord(lastRun.status)}` : "No history yet"}
             </div>
             {lastRun?.error ? (
               <div className={`${styles.statusSubtle} ${styles.errorLine}`}>{lastRun.error}</div>
             ) : lastRun?.warning ? (
               <div className={`${styles.statusSubtle} ${styles.warnLine}`}>{lastRun.warning}</div>
+            ) : data.modeBannerNote ? (
+              <div className={styles.statusSubtle}>{data.modeBannerNote}</div>
             ) : (
               <div className={styles.statusSubtle}>
                 {lastRun?.status === "completed"
                   ? "Everything looks healthy."
                   : lastRun?.status === "running"
-                    ? "Manual sync is in progress."
+                    ? `${primaryActionLabel} is in progress.`
                     : "Open run history for details."}
               </div>
             )}
@@ -225,7 +238,7 @@ export function DashboardPage({ initialData }: Props) {
             <ul className={styles.storyList}>
               {lastRun.addedToSpotifyPreview.map((item, index) => (
                 <li className={styles.storyItem} key={`${item.title}-${index}`}>
-                  {item.title} · {item.artist}
+                  {item.title} | {item.artist}
                   <div className={styles.storyItemMeta}>{item.playlist}</div>
                 </li>
               ))}
@@ -249,7 +262,7 @@ export function DashboardPage({ initialData }: Props) {
             <ul className={styles.storyList}>
               {lastRun.addedToApplePreview.map((item, index) => (
                 <li className={styles.storyItem} key={`${item.title}-${index}`}>
-                  {item.title} · {item.artist}
+                  {item.title} | {item.artist}
                   <div className={styles.storyItemMeta}>{item.playlist}</div>
                 </li>
               ))}
@@ -274,7 +287,7 @@ export function DashboardPage({ initialData }: Props) {
               <ul className={styles.storyList}>
                 {lastRun.unmatchedPreview.map((item, index) => (
                   <li className={styles.storyItem} key={`${item.title}-${index}`}>
-                    {item.title} · {item.artist}
+                    {item.title} | {item.artist}
                     <div className={styles.storyItemMeta}>{item.playlist}</div>
                   </li>
                 ))}
@@ -283,7 +296,7 @@ export function DashboardPage({ initialData }: Props) {
                 className={styles.reviewLink}
                 href={`/unmatched?runId=${encodeURIComponent(lastRun.runId)}&status=pending`}
               >
-                Review →
+                Review {"->"}
               </Link>
             </>
           ) : (
@@ -324,18 +337,18 @@ export function DashboardPage({ initialData }: Props) {
                     </div>
                     <div className={styles.historyMeta}>
                       {formatTime(run.startedAt)}
-                      {run.durationSeconds != null ? ` · ${formatDuration(run.durationSeconds)}` : ""}
+                      {run.durationSeconds != null ? ` | ${formatDuration(run.durationSeconds)}` : ""}
                     </div>
                   </div>
                   <div className={styles.historyChevron} aria-hidden="true">
-                    {isExpanded ? "▲" : "▼"}
+                    {isExpanded ? "^" : "v"}
                   </div>
                 </button>
 
                 {isExpanded ? (
                   <div className={styles.historyDetail}>
                     {loading && !detail ? (
-                      <div className={styles.loadingText}>Loading run details…</div>
+                      <div className={styles.loadingText}>Loading run details...</div>
                     ) : detail ? (
                       <>
                         <div className={styles.detailGrid}>
@@ -345,7 +358,7 @@ export function DashboardPage({ initialData }: Props) {
                               <ul className={styles.detailList}>
                                 {detail.addedToSpotify.map((item, index) => (
                                   <li key={`${detail.id}-sp-${index}`}>
-                                    {item.title} · {item.artist}
+                                    {item.title} | {item.artist}
                                   </li>
                                 ))}
                               </ul>
@@ -359,7 +372,7 @@ export function DashboardPage({ initialData }: Props) {
                               <ul className={styles.detailList}>
                                 {detail.addedToApple.map((item, index) => (
                                   <li key={`${detail.id}-am-${index}`}>
-                                    {item.title} · {item.artist}
+                                    {item.title} | {item.artist}
                                   </li>
                                 ))}
                               </ul>
@@ -369,24 +382,18 @@ export function DashboardPage({ initialData }: Props) {
                           </div>
                         </div>
                         <div className={styles.detailMuted}>
-                          Playlists scanned: {detail.playlistsScanned} · unchanged skipped:{" "}
-                          {detail.playlistsSkipped}
+                          Playlists scanned: {detail.playlistsScanned} | unchanged skipped: {detail.playlistsSkipped}
                         </div>
+                        {detail.notes ? <div className={styles.detailMuted}>{detail.notes}</div> : null}
                         {detail.warning ? (
-                          <div className={`${styles.detailMuted} ${styles.warnLine}`}>
-                            {detail.warning}
-                          </div>
+                          <div className={`${styles.detailMuted} ${styles.warnLine}`}>{detail.warning}</div>
                         ) : null}
                         {detail.error ? (
-                          <div className={`${styles.detailMuted} ${styles.errorLine}`}>
-                            {detail.error}
-                          </div>
+                          <div className={`${styles.detailMuted} ${styles.errorLine}`}>{detail.error}</div>
                         ) : null}
                       </>
                     ) : (
-                      <div className={`${styles.loadingText} ${styles.errorLine}`}>
-                        Could not load run details.
-                      </div>
+                      <div className={`${styles.loadingText} ${styles.errorLine}`}>Could not load run details.</div>
                     )}
                   </div>
                 ) : null}

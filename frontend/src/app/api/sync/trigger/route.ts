@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
-import { triggerManualSync } from "@/lib/mock/store";
+import { triggerManualSync } from "@/lib/server/provider";
 
 export async function POST() {
-  const result = triggerManualSync();
+  const result = await triggerManualSync();
   return NextResponse.json(result);
 }
