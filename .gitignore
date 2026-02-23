@@ -1,0 +1,31 @@
+music-sync-plan.md
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs / temp
+*.log
+.DS_Store
+Thumbs.db
+
+# Playwright artifacts
+playwright-report/
+test-results/
+
+# IDE
+.vscode/
+.idea/
