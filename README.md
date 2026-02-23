@@ -30,3 +30,4 @@ npm run dev
 ## Notes
 
 - `music-sync-plan.md` is intentionally ignored and kept local-only.
+- See `docs/fast-track-testing.md` for the current UX slice test runbook and next integration steps.
