@@ -1,9 +1,13 @@
 export type AuthHealth = "healthy" | "invalid" | "missing";
+export type BackendMode = "mock" | "spotify_readonly";
+export type RunKind = "snapshot_refresh" | "sync";
 
 export type AppShellStatus = {
   spotifyAuth: AuthHealth;
   appleAuth: AuthHealth;
   pendingUnmatchedCount: number;
+  backendMode?: BackendMode;
+  readOnlyMode?: boolean;
 };
 
 export type SyncRunStatus = "running" | "completed" | "partial" | "failed";
@@ -29,6 +33,7 @@ export type RunHistoryRowView = {
   id: string;
   startedAt: string;
   status: SyncRunStatus;
+  runKind?: RunKind;
   summaryLine: string;
   durationSeconds: number | null;
   counts: RunCounts;
@@ -41,6 +46,7 @@ export type RunDetailView = {
   startedAt: string;
   completedAt: string | null;
   status: SyncRunStatus;
+  runKind?: RunKind;
   durationSeconds: number | null;
   triggeredBy: TriggeredBy;
   counts: RunCounts;
@@ -71,6 +77,10 @@ export type DashboardView = {
   lastRun: DashboardLastRunView | null;
   history: RunHistoryRowView[];
   setupRequired: boolean;
+  backendMode?: BackendMode;
+  readOnlyMode?: boolean;
+  primaryActionLabel?: "Sync Now" | "Refresh Snapshot";
+  modeBannerNote?: string;
 };
 
 export type SetupStatusView = {
@@ -80,6 +90,10 @@ export type SetupStatusView = {
   initialScanRunId: string | null;
   stageLabel: string | null;
   setupComplete: boolean;
+  mode?: BackendMode;
+  readOnlyMode?: boolean;
+  appleDeferred?: boolean;
+  spotifyProfileName?: string;
 };
 
 export type UnmatchedCandidate = {

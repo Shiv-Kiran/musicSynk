@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
 
 import { SetupWizard } from "@/components/setup-wizard";
-import { getSetupStatusView } from "@/lib/mock/store";
+import { getSetupStatusView } from "@/lib/server/provider";
 
-export default function SetupPage() {
-  const status = getSetupStatusView();
+export default async function SetupPage() {
+  const status = await getSetupStatusView();
 
   if (status.setupComplete) {
     redirect("/dashboard");

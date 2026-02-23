@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { getSetupStatusView } from "@/lib/mock/store";
+import { getSetupStatusView } from "@/lib/server/provider";
 
 export async function GET() {
-  return NextResponse.json(getSetupStatusView());
+  return NextResponse.json(await getSetupStatusView());
 }
