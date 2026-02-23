@@ -85,7 +85,8 @@ export function UnmatchedPage({ initialData }: Props) {
   function markBusy(id: string, action: string | null) {
     setBusyCardIds((prev) => {
       if (action == null) {
-        const { [id]: _removed, ...rest } = prev;
+        const rest = { ...prev };
+        delete rest[id];
         return rest;
       }
       return { ...prev, [id]: action };
@@ -148,7 +149,7 @@ export function UnmatchedPage({ initialData }: Props) {
     });
   }
 
-  async function useBestGuess(song: UnmatchedSongCardView) {
+  async function applyBestGuess(song: UnmatchedSongCardView) {
     if (!song.bestCandidate) return;
     setUiError(null);
     markBusy(song.id, "mapping");
@@ -322,7 +323,7 @@ export function UnmatchedPage({ initialData }: Props) {
                   </div>
 
                   <div className={styles.metaLine}>
-                    from {formatSource(song.sourceService)} · in "{song.playlistName}"
+                    from {formatSource(song.sourceService)} · in &quot;{song.playlistName}&quot;
                   </div>
 
                   <div className={styles.reason}>Reason: {song.reasonLabel}</div>
@@ -342,7 +343,7 @@ export function UnmatchedPage({ initialData }: Props) {
                         <button
                           className={styles.useBtn}
                           type="button"
-                          onClick={() => void useBestGuess(song)}
+                          onClick={() => void applyBestGuess(song)}
                           disabled={busy}
                         >
                           Use this ↑
@@ -378,7 +379,7 @@ export function UnmatchedPage({ initialData }: Props) {
                       <button
                         className={styles.confirmBtn}
                         type="button"
-                        onClick={() => void useBestGuess(song)}
+                        onClick={() => void applyBestGuess(song)}
                         disabled={busy || !song.bestCandidate || !selected}
                         title={
                           song.bestCandidate
@@ -480,7 +481,7 @@ export function UnmatchedPage({ initialData }: Props) {
                     {song.album ? ` · ${song.album}` : ""}
                   </div>
                   <div className={styles.metaLine}>
-                    {formatSource(song.sourceService)} · "{song.playlistName}"
+                    {formatSource(song.sourceService)} · &quot;{song.playlistName}&quot;
                   </div>
                 </article>
               ))}

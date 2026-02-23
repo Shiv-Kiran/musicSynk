@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
+import { startTransition, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import type { SetupStatusView } from "@/lib/types";
@@ -54,7 +54,7 @@ export function SetupWizard({ initialStatus }: Props) {
     };
   }, []);
 
-  const refreshStatus = useEffectEvent(async () => {
+  async function refreshStatus() {
     try {
       const next = await api<SetupStatusView>("/api/setup/status");
       if (!mountedRef.current) return;
@@ -70,7 +70,7 @@ export function SetupWizard({ initialStatus }: Props) {
       if (!mountedRef.current) return;
       setStatusError("Could not refresh setup status.");
     }
-  });
+  }
 
   useEffect(() => {
     if (status.setupComplete) return;

@@ -105,10 +105,6 @@ const manualSyncTemplates = [
   },
 ];
 
-function iso(msOffset = 0) {
-  return new Date(Date.now() + msOffset).toISOString();
-}
-
 function makeRun(
   id: string,
   status: SyncRunStatus,
@@ -813,7 +809,7 @@ export function getUnmatchedListView(query: UnmatchedQuery = {}): UnmatchedListV
   };
 }
 
-export function useBestGuessForUnmatchedSong(id: string) {
+export function applyBestGuessForUnmatchedSong(id: string) {
   const state = getState();
   advanceSimulations(state);
   const song = state.unmatchedSongs.find((item) => item.id === id);
