@@ -1,6 +1,6 @@
 import "server-only";
 
-import { getServerConfig } from "@/lib/server/config";
+import { getServerConfig, hasSpotifyReadonlyEnv } from "@/lib/server/config";
 import { mockProvider } from "./mock";
 import { spotifyReadonlyProvider } from "./spotify-readonly";
 import type { AppProvider } from "./types";
@@ -8,6 +8,9 @@ import type { AppProvider } from "./types";
 function resolveProvider(): AppProvider {
   const config = getServerConfig();
   if (config.appMode === "spotify_readonly") {
+    if (!hasSpotifyReadonlyEnv()) {
+      return mockProvider;
+    }
     return spotifyReadonlyProvider;
   }
   return mockProvider;

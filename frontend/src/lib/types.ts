@@ -11,7 +11,7 @@ export type AppShellStatus = {
 };
 
 export type SyncRunStatus = "running" | "completed" | "partial" | "failed";
-export type TriggeredBy = "cron" | "manual" | "initial_setup";
+export type TriggeredBy = "cron" | "manual" | "initial_setup" | "post_reauth";
 export type SetupScanStatus = "not_started" | "queued" | "running" | "completed" | "failed";
 export type UnmatchedStatus = "pending" | "mapped" | "dismissed";
 export type SourceService = "spotify" | "apple_music";

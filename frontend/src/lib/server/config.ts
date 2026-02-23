@@ -60,3 +60,15 @@ export function getEncryptionSecret() {
   const config = getServerConfig();
   return requireString(config.encryptionKey, "ENCRYPTION_KEY");
 }
+
+export function hasSpotifyReadonlyEnv() {
+  const config = getServerConfig();
+  return Boolean(
+    config.supabaseUrl &&
+      config.supabaseServiceKey &&
+      config.encryptionKey &&
+      config.spotifyClientId &&
+      config.spotifyClientSecret &&
+      config.spotifyRedirectUri,
+  );
+}
