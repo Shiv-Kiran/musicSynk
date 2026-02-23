@@ -1,0 +1,225 @@
+.stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: 1.2rem;
+  line-height: 1.15;
+  margin-bottom: 0.2rem;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.status {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.4rem 0.7rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.statusSaving {
+  color: var(--accent-strong);
+  border-color: rgba(117, 135, 255, 0.25);
+  background: rgba(117, 135, 255, 0.06);
+}
+
+.statusSaved {
+  color: var(--success);
+  border-color: rgba(87, 213, 140, 0.24);
+  background: rgba(87, 213, 140, 0.05);
+}
+
+.statusError {
+  color: var(--danger);
+  border-color: rgba(255, 111, 124, 0.26);
+  background: rgba(255, 111, 124, 0.05);
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.9rem;
+  background: rgba(255, 255, 255, 0.012);
+  display: grid;
+  gap: 0.75rem;
+}
+
+.panelTitle {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.panelSub {
+  color: var(--text-dim);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.rows {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.toggleRow {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.toggleCopy {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.toggleTitle {
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.toggleDesc {
+  color: var(--text-dim);
+  font-size: 0.82rem;
+}
+
+.switch {
+  width: 2.6rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.02);
+  position: relative;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.switchThumb {
+  position: absolute;
+  top: 0.15rem;
+  left: 0.15rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 999px;
+  background: var(--text-dim);
+  transition: transform 120ms ease, background-color 120ms ease;
+}
+
+.switchOn {
+  border-color: rgba(117, 135, 255, 0.28);
+  background: rgba(117, 135, 255, 0.12);
+}
+
+.switchOn .switchThumb {
+  transform: translateX(1.05rem);
+  background: var(--accent-strong);
+}
+
+.rangeWrap {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.rangeHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.rangeValue {
+  font-family: var(--font-mono), monospace;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.range {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.rangeScale {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+}
+
+.playlistList {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.playlistRow {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.playlistName {
+  font-weight: 600;
+}
+
+.playlistHint {
+  color: var(--text-dim);
+  font-size: 0.82rem;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.saveBtn {
+  border: 1px solid rgba(117, 135, 255, 0.28);
+  background: rgba(117, 135, 255, 0.12);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 0.65rem 0.85rem;
+  font-weight: 600;
+}
+
+.saveBtn:hover:not(:disabled) {
+  background: rgba(117, 135, 255, 0.18);
+}
+
+.saveBtn:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switch,
+  .switchThumb {
+    transition: none;
+  }
+}
