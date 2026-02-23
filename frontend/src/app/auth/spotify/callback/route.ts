@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+import { getServerConfig } from "@/lib/server/config";
 import { upsertEncryptedAuthSession } from "@/lib/server/data/auth-sessions";
 import {
   exchangeSpotifyCodeForTokens,
@@ -10,8 +11,20 @@ import {
 
 const SPOTIFY_OAUTH_STATE_COOKIE = "musicsynk_spotify_oauth_state";
 
+function getAppBaseUrl(requestUrl: URL) {
+  const configuredBaseUrl = getServerConfig().appBaseUrl;
+  if (configuredBaseUrl) {
+    return new URL(configuredBaseUrl);
+  }
+  return new URL(requestUrl.origin);
+}
+
+function buildSetupRedirectUrl(requestUrl: URL) {
+  return new URL("/setup", getAppBaseUrl(requestUrl));
+}
+
 function redirectWithError(requestUrl: URL, message: string) {
-  const redirectUrl = new URL("/setup", requestUrl);
+  const redirectUrl = buildSetupRedirectUrl(requestUrl);
   redirectUrl.searchParams.set("error", message);
   return NextResponse.redirect(redirectUrl);
 }
@@ -56,7 +69,9 @@ export async function GET(request: Request) {
       },
     });
 
-    return NextResponse.redirect(new URL("/setup?spotify=connected", url));
+    const successUrl = buildSetupRedirectUrl(url);
+    successUrl.searchParams.set("spotify", "connected");
+    return NextResponse.redirect(successUrl);
   } catch (exchangeError) {
     const message =
       exchangeError instanceof Error ? exchangeError.message : "spotify_oauth_failed";
