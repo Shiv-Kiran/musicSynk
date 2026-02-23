@@ -1,0 +1,221 @@
+.wrap {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1.1rem;
+}
+
+.panel {
+  width: min(840px, 100%);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 86% -18%, rgba(117, 135, 255, 0.14), transparent 42%),
+    rgba(255, 255, 255, 0.018);
+  box-shadow: var(--shadow-soft);
+  padding: 1rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 0.4rem 0.35rem 0.85rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+}
+
+.brandMark {
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  color: var(--accent-strong);
+  border: 1px solid rgba(117, 135, 255, 0.28);
+  background: rgba(117, 135, 255, 0.12);
+}
+
+.stepMeta {
+  color: var(--text-muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.78rem;
+}
+
+.progressRail {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.55rem;
+  margin-bottom: 0.95rem;
+}
+
+.progressStep {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.65rem 0.75rem;
+  background: rgba(255, 255, 255, 0.01);
+  color: var(--text-muted);
+}
+
+.progressStepActive {
+  border-color: rgba(117, 135, 255, 0.28);
+  background: rgba(117, 135, 255, 0.09);
+  color: var(--text);
+}
+
+.progressStepDone {
+  border-color: rgba(87, 213, 140, 0.22);
+  background: rgba(87, 213, 140, 0.06);
+}
+
+.progressTitle {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.15rem;
+}
+
+.progressSub {
+  font-size: 0.78rem;
+}
+
+.card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.015);
+  padding: 1rem;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.cardTitle {
+  font-size: 1.2rem;
+  line-height: 1.15;
+}
+
+.cardBody {
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.statusLine {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.8rem;
+}
+
+.statusDot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: var(--text-dim);
+}
+
+.statusRunning {
+  background: var(--accent);
+  box-shadow: 0 0 0 3px rgba(117, 135, 255, 0.14);
+}
+
+.statusDone {
+  background: var(--success);
+  box-shadow: 0 0 0 3px rgba(87, 213, 140, 0.14);
+}
+
+.statusWarn {
+  background: var(--warn);
+  box-shadow: 0 0 0 3px rgba(241, 187, 78, 0.14);
+}
+
+.ctaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.primaryBtn {
+  border: 1px solid rgba(117, 135, 255, 0.34);
+  background: linear-gradient(180deg, rgba(117, 135, 255, 0.25), rgba(117, 135, 255, 0.16));
+  color: var(--text);
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  font-weight: 600;
+}
+
+.primaryBtn:hover:not(:disabled) {
+  background: linear-gradient(180deg, rgba(117, 135, 255, 0.31), rgba(117, 135, 255, 0.2));
+}
+
+.primaryBtn:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.ghostBtn {
+  color: var(--text-muted);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.72rem 0.9rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.ghostBtn:hover:not(:disabled) {
+  color: var(--text);
+  border-color: var(--line-strong);
+}
+
+.note {
+  color: var(--text-dim);
+  font-size: 0.88rem;
+}
+
+.ok {
+  color: var(--success);
+}
+
+.error {
+  color: var(--danger);
+}
+
+.scanBox {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.01);
+  display: grid;
+  gap: 0.5rem;
+}
+
+.scanHint {
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+@media (max-width: 720px) {
+  .panel {
+    padding: 0.85rem;
+  }
+
+  .progressRail {
+    grid-template-columns: 1fr;
+  }
+
+  .ctaRow {
+    align-items: stretch;
+  }
+
+  .ctaRow button {
+    width: 100%;
+  }
+}
