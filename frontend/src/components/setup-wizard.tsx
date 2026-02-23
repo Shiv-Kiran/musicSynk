@@ -8,6 +8,7 @@ import styles from "./setup-wizard.module.css";
 
 type Props = {
   initialStatus: SetupStatusView;
+  oauthError?: string | null;
 };
 
 type AsyncState = "idle" | "pending" | "error";
@@ -36,7 +37,7 @@ function getCurrentStep(status: SetupStatusView) {
   return 3;
 }
 
-export function SetupWizard({ initialStatus }: Props) {
+export function SetupWizard({ initialStatus, oauthError = null }: Props) {
   const router = useRouter();
   const [status, setStatus] = useState(initialStatus);
   const [spotifyAction, setSpotifyAction] = useState<AsyncState>("idle");
@@ -51,6 +52,14 @@ export function SetupWizard({ initialStatus }: Props) {
   const spotifyConnectedLabel = status.spotifyProfileName
     ? `Connected as ${status.spotifyProfileName}`
     : "Connected";
+  const oauthErrorMessage =
+    oauthError === "spotify_oauth_state_mismatch"
+      ? "Spotify login verification failed (state mismatch). Make sure you are using the same host (127.0.0.1) for the full flow, then try again."
+      : oauthError === "spotify_oauth_missing_code_or_state"
+        ? "Spotify callback was missing OAuth data. Start again from the Connect Spotify button."
+        : oauthError
+          ? `Spotify auth error: ${oauthError}`
+          : null;
 
   useEffect(() => {
     mountedRef.current = true;
@@ -194,6 +203,27 @@ export function SetupWizard({ initialStatus }: Props) {
     }
   }
 
+  async function disconnectSpotify() {
+    setSpotifyAction("pending");
+    setStatusError(null);
+    try {
+      await api<SetupStatusView>("/api/auth/spotify/logout", {
+        method: "POST",
+        body: JSON.stringify({}),
+      });
+      const next = await api<SetupStatusView>("/api/setup/status");
+      setStatus(next);
+      setSpotifyAction("idle");
+      startTransition(() => {
+        router.replace("/setup");
+        router.refresh();
+      });
+    } catch {
+      setSpotifyAction("error");
+      setStatusError("Could not disconnect Spotify.");
+    }
+  }
+
   const scanBusy = status.initialScanStatus === "queued" || status.initialScanStatus === "running";
 
   return (
@@ -289,6 +319,16 @@ export function SetupWizard({ initialStatus }: Props) {
               <button className={styles.ghostBtn} type="button" onClick={() => void refreshStatus()}>
                 Refresh status
               </button>
+              {readOnlyMode && status.spotifyConnected ? (
+                <button
+                  className={styles.ghostBtn}
+                  type="button"
+                  onClick={disconnectSpotify}
+                  disabled={spotifyAction === "pending"}
+                >
+                  {spotifyAction === "pending" ? "Disconnecting..." : "Disconnect Spotify"}
+                </button>
+              ) : null}
             </div>
           </section>
         ) : null}
@@ -389,6 +429,16 @@ export function SetupWizard({ initialStatus }: Props) {
               <button className={styles.ghostBtn} type="button" onClick={() => void refreshStatus()}>
                 Refresh status
               </button>
+              {readOnlyMode && status.spotifyConnected ? (
+                <button
+                  className={styles.ghostBtn}
+                  type="button"
+                  onClick={disconnectSpotify}
+                  disabled={spotifyAction === "pending"}
+                >
+                  {spotifyAction === "pending" ? "Disconnecting..." : "Disconnect Spotify"}
+                </button>
+              ) : null}
             </div>
 
             {status.setupComplete ? (
@@ -397,6 +447,7 @@ export function SetupWizard({ initialStatus }: Props) {
           </section>
         ) : null}
 
+        {oauthErrorMessage ? <p className={`${styles.note} ${styles.error}`}>{oauthErrorMessage}</p> : null}
         {statusError ? <p className={`${styles.note} ${styles.error}`}>{statusError}</p> : null}
       </section>
     </main>

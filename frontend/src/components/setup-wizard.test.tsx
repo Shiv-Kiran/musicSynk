@@ -12,6 +12,7 @@ const routerMock = {
 
 vi.mock("next/navigation", () => ({
   useRouter: () => routerMock,
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 describe("SetupWizard", () => {
