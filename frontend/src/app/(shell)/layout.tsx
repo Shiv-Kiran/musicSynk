@@ -1,16 +1,9 @@
 import type { ReactNode } from "react";
 
 import { AppShellLayout } from "@/components/app-shell-layout";
-import type { AppShellStatus } from "@/lib/types";
-
-const placeholderShellStatus: AppShellStatus = {
-  spotifyAuth: "healthy",
-  appleAuth: "healthy",
-  pendingUnmatchedCount: 4,
-};
+import { getAppShellStatusView } from "@/lib/mock/store";
 
 export default function ShellLayout({ children }: { children: ReactNode }) {
-  return (
-    <AppShellLayout shellStatus={placeholderShellStatus}>{children}</AppShellLayout>
-  );
+  const shellStatus = getAppShellStatusView();
+  return <AppShellLayout shellStatus={shellStatus}>{children}</AppShellLayout>;
 }
